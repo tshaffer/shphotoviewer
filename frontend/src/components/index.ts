@@ -1,7 +1,5 @@
 export * from './App';
 export * from './FullScreenPhoto';
-export * from './Keywords';
-export * from './KeywordTreeItem';
 export * from './LoupeView';
 export * from './LoupeViewController';
 export * from './PhotoProperties';

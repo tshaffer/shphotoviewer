@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import '../styles/TedTagger.css';
-import { loadMediaItems, loadKeywordData, loadTakeouts, importFromTakeout, loadDeletedMediaItems, uploadRawMedia } from '../controllers';
+import { loadMediaItems, loadKeywordData, loadTakeouts, importFromTakeout, loadDeletedMediaItems } from '../controllers';
 import { TedTaggerDispatch, setAppInitialized, setGoogleUserProfile } from '../models';
 import { getKeywordRootNodeId, getPhotoLayout, getSelectedMediaItems } from '../selectors';
 
@@ -12,8 +12,6 @@ import { MediaItem, PhotoLayout } from '../types';
 import SurveyView from './SurveyView';
 import TopToolbar from './TopToolbar';
 import GridView from './GridView';
-import { uploadToGoogle, getAlbumNamesWherePeopleNotRetrieved } from '../controllers';
-import { uploadPeopleTakeouts } from '../controllers';
 
 declare module 'react' {
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -235,112 +233,6 @@ const App = (props: AppProps) => {
       // <a href="/auth/google">Login with Google</a>
     );
   }
-
-  const handleImportFromTakeout = (takeoutId: string) => {
-    props.onImportFromTakeout(takeoutId);
-  };
-
-  const handleMergePeople = async (peopleTakeoutFiles: FileList) => {
-    console.log('handleMergePeople', peopleTakeoutFiles);
-
-    setMergingPeople(true);
-    setError(null);
-    setSuccessMessage(null);
-
-    const formData = new FormData();
-    const allowedExtensions = ['.json']; // Allowed file extensions
-
-    // Append only files with allowed extensions
-    Array.from(peopleTakeoutFiles).forEach((file) => {
-      const fileExtension = file.name.split('.').pop()?.toLowerCase();
-      if (fileExtension && allowedExtensions.includes(`.${fileExtension}`)) {
-        formData.append('files', file, file.webkitRelativePath);
-      }
-    });
-
-    try {
-      const response = await uploadPeopleTakeouts(formData);
-
-      if (response.ok) {
-        setSuccessMessage('Folder uploaded successfully!');
-      } else {
-        const errorMessage = await response.text();
-        setError(`Upload failed: ${errorMessage}`);
-      }
-    } catch (err) {
-      setError(`Upload failed: ${err}`);
-    } finally {
-      setMergingPeople(false);
-    }
-
-  };
-
-  const handleImportFromDrive = async (files: FileList) => {
-
-    console.log('handleImportFromDrive', files);
-    if (!files) {
-      setError('Please select file(s) first');
-      return;
-    }
-
-    setImporting(true);
-    setError(null);
-    setSuccessMessage(null);
-
-    const formData = new FormData();
-
-    // Append all files in the folder to the FormData object
-    Array.from(files).forEach((file) => {
-      formData.append('files', file, file.name);
-    });
-
-    try {
-      const response = await uploadRawMedia(formData);
-
-      if (response.ok) {
-        setSuccessMessage('Import completed successfully!');
-      } else {
-        const errorMessage = await response.text();
-        setError(`Import failed: ${errorMessage}`);
-      }
-    } catch (err) {
-      setError(`Import failed: ${err}`);
-    } finally {
-      setImporting(false);
-    }
-  };
-
-  const handleRetrievePeople = async () => {
-    console.log('handleRetrievePeople');
-    const albumNames = await getAlbumNamesWherePeopleNotRetrieved();
-    console.log('albumNames', albumNames);
-  };
-
-  const handleUploadToGoogle = async (albumName: string) => {
-    console.log('handleUploadToGoogle', albumName);
-
-    setUploadingToGoogle(true);
-    setError(null);
-    setSuccessMessage(null);
-
-    const mediaItemIds: string[] = props.selectedMediaItems.map((mediaItem) => mediaItem.uniqueId);
-
-    try {
-      const response = await uploadToGoogle(albumName, mediaItemIds);
-
-      if (response.ok) {
-        setSuccessMessage('Upload to google completed successfully!');
-      } else {
-        const errorMessage = await response.text();
-        setError(`Upload to google failed: ${errorMessage}`);
-      }
-    } catch (err) {
-      setError(`Upload to google failed: ${err}`);
-    } finally {
-      setUploadingToGoogle(false);
-    }
-
-  };
 
   const renderLeftPanel = (): JSX.Element => {
     return (

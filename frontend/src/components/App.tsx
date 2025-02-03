@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import '../styles/TedTagger.css';
-import { loadMediaItems, loadDeletedMediaItems } from '../controllers';
+import { loadMediaItems } from '../controllers';
 import { TedTaggerDispatch, setAppInitialized, setGoogleUserProfile } from '../models';
 import { getPhotoLayout, getSelectedMediaItems } from '../selectors';
 
@@ -23,7 +23,6 @@ export interface AppProps {
   photoLayout: PhotoLayout;
   selectedMediaItems: MediaItem[],
   onLoadMediaItems: () => any;
-  onLoadDeletedMediaItems: () => any;
   onSetAppInitialized: () => any;
   onSetGoogleUserProfile: (googleUserProfile: any) => void;
 }
@@ -280,7 +279,6 @@ function mapStateToProps(state: any) {
 const mapDispatchToProps = (dispatch: TedTaggerDispatch) => {
   return bindActionCreators({
     onLoadMediaItems: loadMediaItems,
-    onLoadDeletedMediaItems: loadDeletedMediaItems,
     onSetAppInitialized: setAppInitialized,
     onSetGoogleUserProfile: setGoogleUserProfile,
   }, dispatch);

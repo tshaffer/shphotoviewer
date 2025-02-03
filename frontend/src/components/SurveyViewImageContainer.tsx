@@ -13,7 +13,6 @@ import { getMediaItemZoomFactor, getSurveyModeZoomFactor } from '../selectors';
 
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { deleteSurveyViewImageContainerItem } from '../controllers';
 import { surveyRowHeights } from '../constants';
 
 const cardMediaStyle = {
@@ -31,7 +30,6 @@ export interface SurveyViewImageContainerPropsFromParent {
 export interface SurveyViewImageContainerProps extends SurveyViewImageContainerPropsFromParent {
   surveyModeZoomFactor: number;
   mediaItemZoomFactor: number;
-  onDeleteSurveyViewImageContainerItem: (mediaItemId: string) => any;
   onSetMediaItemZoomFactor: (mediaItemId: string, zoomFactor: number) => any;
 }
 
@@ -93,7 +91,6 @@ function mapStateToProps(state: any, ownProps: any) {
 
 const mapDispatchToProps = (dispatch: TedTaggerDispatch) => {
   return bindActionCreators({
-    onDeleteSurveyViewImageContainerItem: deleteSurveyViewImageContainerItem,
     onSetMediaItemZoomFactor: setMediaItemZoomFactor,
   }, dispatch);
 };

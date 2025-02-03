@@ -10,13 +10,12 @@ import { Tooltip } from '@mui/material';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import CompareIcon from '@mui/icons-material/Compare';
-import InfoIcon from '@mui/icons-material/Info';
 import DeselectIcon from '@mui/icons-material/Deselect';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 
-import { GoogleUserProfile, MediaItem, PhotoLayout, ReviewLevel } from '../types';
-import { getSelectedMediaItemIds, getMediaItems, getNumGridColumns, getPhotoLayout, getSurveyModeZoomFactor, getDeletedMediaItems, getLoupeViewMediaItemIds, getMediaItemIds, getSelectedMediaItems, getLoupeViewMediaItemId, getGoogleUserProfile } from '../selectors';
-import { deleteMediaItems, deselectAllPhotos, redownloadMediaItem, selectPhoto, setReviewLevel } from '../controllers';
+import { MediaItem, PhotoLayout } from '../types';
+import { getSelectedMediaItemIds, getMediaItems, getNumGridColumns, getPhotoLayout, getSurveyModeZoomFactor, getLoupeViewMediaItemIds, getMediaItemIds, getSelectedMediaItems, getLoupeViewMediaItemId } from '../selectors';
+import { deselectAllPhotos, selectPhoto } from '../controllers';
 import { sliderContainerXTranslate } from '../constants';
 
 export interface TopToolbarProps {
@@ -24,25 +23,20 @@ export interface TopToolbarProps {
   mediaItemIds: string[];
   selectedMediaItems: MediaItem[];
   selectedMediaItemIds: string[];
-  googleUserProfile: GoogleUserProfile | null;
   loupeViewMediaItemId: string;
   loupeViewMediaItemIds: string[];
   numGridColumns: number;
   surveyModeZoomFactor: number;
   photoLayout: PhotoLayout;
-  deletedMediaItems: MediaItem[];
   onSetNumGridColumns: (numGridColumns: number) => void;
   onSetSurveyModeZoomFactor: (numGridColumns: number) => void;
   onSetPhotoLayout: (photoLayout: PhotoLayout) => void;
   onSetLoupeViewMediaItemId: (id: string) => any;
   onSetScrollPosition: (scrollPosition: number) => any;
-  onDeleteMediaItems: (mediaItemIds: string[]) => any;
-  onRedownloadMediaItem: (mediaItemId: string) => any;
   onDeselectAllPhotos: () => void;
   onSelectPhoto: (id: string, commandKey: boolean, shiftKey: boolean) => any;
   onSetLoupeViewMediaItemIds: (mediaItemIds: string[]) => any;
   onRemoveLoupeViewMediaItemId: (mediaItemId: string) => any;
-  onSetReviewsLevel: (mediaItemIds: string[], reviewLevel: ReviewLevel) => any;
 }
 
 const TopToolbar = (props: TopToolbarProps) => {
@@ -159,18 +153,6 @@ const TopToolbar = (props: TopToolbarProps) => {
     return null;
   };
 
-  const renderUserProfile = (): JSX.Element => {
-    if (props.googleUserProfile) {
-      return (
-        <span>{props.googleUserProfile.name}</span>
-      );
-    } else {
-      return (
-        <span>Not signed in</span>
-      );
-    }
-  }
-
   return (
     <React.Fragment>
       <div className='toolbarIconButtonContainer'>
@@ -230,9 +212,6 @@ const TopToolbar = (props: TopToolbarProps) => {
           </Tooltip>
           {getPhotoLayoutPropsUI()}
         </div>
-        <div style={{ paddingRight: '10px' }}>
-          {renderUserProfile()}
-        </div>
       </div>
 
     </React.Fragment>
@@ -251,8 +230,6 @@ function mapStateToProps(state: any) {
     numGridColumns: getNumGridColumns(state),
     surveyModeZoomFactor: getSurveyModeZoomFactor(state),
     photoLayout: getPhotoLayout(state),
-    deletedMediaItems: getDeletedMediaItems(state),
-    googleUserProfile: getGoogleUserProfile(state),
   };
 }
 
@@ -263,13 +240,10 @@ const mapDispatchToProps = (dispatch: TedTaggerDispatch) => {
     onSetNumGridColumns: setNumGridColumnsRedux,
     onSetSurveyModeZoomFactor: setSurveyModeZoomFactorRedux,
     onSetScrollPosition: setScrollPositionRedux,
-    onDeleteMediaItems: deleteMediaItems,
-    onRedownloadMediaItem: redownloadMediaItem,
     onDeselectAllPhotos: deselectAllPhotos,
     onSelectPhoto: selectPhoto,
     onSetLoupeViewMediaItemIds: setLoupeViewMediaItemIds,
     onRemoveLoupeViewMediaItemId: removeLoupeViewMediaItemId,
-    onSetReviewsLevel: setReviewLevel,
   }, dispatch);
 };
 

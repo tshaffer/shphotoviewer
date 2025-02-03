@@ -1,74 +1,43 @@
-import { bindActionCreators } from 'redux';
+import React from 'react';
 import { connect } from 'react-redux';
 import { MediaItem } from '../types';
-import { TedTaggerDispatch } from '../models';
 import { getMediaItems } from '../selectors';
 import GridCell from './GridCell';
-import { bordersSize } from '../constants';
 
-export interface GridRowPropsFromParent {
+export interface GridRowProps {
   mediaItemIndex: number;
   numMediaItems: number;
   rowHeight: number;
   cellWidths: number[];
-}
-
-export interface GridRowProps extends GridRowPropsFromParent {
-  allMediaItems: MediaItem[],
+  allMediaItems: MediaItem[];
 }
 
 const GridRow = (props: GridRowProps) => {
-
-  if (props.allMediaItems.length === 0) {
-    return null;
-  }
-  
-  const getGridCell = (mediaItemIndex: number, cellWidth: number): JSX.Element => {
-    return (
-      <GridCell
-        key={mediaItemIndex}
-        mediaItemIndex={mediaItemIndex}
-        mediaItem={props.allMediaItems[mediaItemIndex]}
-        rowHeight={props.rowHeight}
-        cellWidth={cellWidth}
-      />
-    );
-  };
-
-  const getGridCells = (): JSX.Element[] => {
-    const gridCells: JSX.Element[] = [];
-    for (let index = props.mediaItemIndex; index < (props.mediaItemIndex + props.numMediaItems); index++) {
-      const cellWidth = props.cellWidths[index - props.mediaItemIndex];
-      const gridCellElement = getGridCell(index, cellWidth);
-      gridCells.push(gridCellElement);
-    }
-    return gridCells;
-  };
-
-  const gridCells = getGridCells();
-
-  const heightAttribute: string = (props.rowHeight + bordersSize).toString() + 'px';
+  if (!props.allMediaItems.length) return null;
 
   return (
-    <div style={{
-      height: heightAttribute,
-      backgroundColor: 'white',
-    }}>
-      {gridCells}
+    <div style={{ height: props.rowHeight, display: 'flex', backgroundColor: 'white' }}>
+      {props.cellWidths.map((cellWidth, index) => {
+        const mediaIndex = props.mediaItemIndex + index;
+        if (mediaIndex >= props.allMediaItems.length) return null;
+        return (
+          <GridCell
+            key={mediaIndex}
+            mediaItemIndex={mediaIndex} // Pass mediaItemIndex explicitly
+            mediaItem={props.allMediaItems[mediaIndex]}
+            rowHeight={props.rowHeight}
+            cellWidth={cellWidth}
+          />
+        );
+      })}
     </div>
   );
-
 };
 
-function mapStateToProps(state: any, ownProps: any) {
+function mapStateToProps(state: any) {
   return {
     allMediaItems: getMediaItems(state),
   };
 }
 
-const mapDispatchToProps = (dispatch: TedTaggerDispatch) => {
-  return bindActionCreators({
-  }, dispatch);
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(GridRow);
+export default connect(mapStateToProps)(GridRow);

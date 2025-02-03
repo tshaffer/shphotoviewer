@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
+
 import { GridRowData, MediaItem } from '../types';
 import { TedTaggerDispatch } from '../models';
 import { getAppInitialized, getMediaItems, getNumGridColumns, getScrollPosition } from '../selectors';
@@ -10,84 +12,57 @@ import { centerColumnWidth, targetHeights } from '../constants';
 
 export interface GridViewProps {
   appInitialized: boolean;
-  allMediaItems: MediaItem[],
+  allMediaItems: MediaItem[];
   numGridColumns: number;
   scrollPosition: number;
 }
 
 const GridView = (props: GridViewProps) => {
+  if (!props.appInitialized || props.allMediaItems.length === 0) {
+    return null;
+  }
 
-  React.useEffect(() => {
+  const targetHeight = targetHeights[props.numGridColumns - 2];
 
-    const divElement = document.getElementById('centerColumn') as HTMLDivElement | null;
-    if (divElement) {
-      // console.log('set scroll position: ', props.scrollPosition);
-      divElement.scrollTop = props.scrollPosition;
-    } else {
-      // console.log('divElement does not exist');
-    }
-
-    return () => {
-      // console.log('GridView React.useEffect for removing event listener invoked');
-    };
-  }, []);
-
-
-  const getGridRowData = (): GridRowData[] => {
-
-    const targetHeight = targetHeights[props.numGridColumns - 2];
-
-    const gridRows: GridRowData[] = [];
+  // Generate virtualized row data
+  const gridRows: GridRowData[] = React.useMemo(() => {
+    const rows: GridRowData[] = [];
     let mediaItemIndex = 0;
-    while (mediaItemIndex < (props.allMediaItems.length - 1)) {
-      const gridRowData: GridRowData = getGridRowHeight(centerColumnWidth, targetHeight, props.allMediaItems, mediaItemIndex, props.allMediaItems.length - 1);
-      mediaItemIndex = mediaItemIndex + gridRowData.numMediaItems;
-      gridRows.push(gridRowData);
+    while (mediaItemIndex < props.allMediaItems.length) {
+      const rowData = getGridRowHeight(
+        centerColumnWidth,
+        targetHeight,
+        props.allMediaItems,
+        mediaItemIndex,
+        props.allMediaItems.length - 1
+      );
+      mediaItemIndex += rowData.numMediaItems;
+      rows.push(rowData);
     }
-    return gridRows;
+    return rows;
+  }, [props.allMediaItems, props.numGridColumns]);
+
+  const rowHeight = targetHeight; // Approximate row height
+
+  // Function to render each row
+  const RowRenderer = ({ index, style }: ListChildComponentProps) => {
+    const rowData = gridRows[index];
+    return <div style={style}><GridRow {...rowData} /></div>;
   };
-
-  const renderGridRow = (gridRowData: GridRowData): JSX.Element => {
-    const { mediaItemIndex, numMediaItems, rowHeight, cellWidths } = gridRowData;
-    return (
-      <GridRow
-        key={mediaItemIndex}
-        mediaItemIndex={mediaItemIndex}
-        numMediaItems={numMediaItems}
-        rowHeight={rowHeight}
-        cellWidths={cellWidths}
-      />
-    );
-  };
-
-  const renderGridRows = (gridRows: GridRowData[]): JSX.Element[] => {
-    const renderedGridRows: JSX.Element[] = gridRows.map((gridRowData: GridRowData, index: number) => {
-      const renderedGridRow = renderGridRow(gridRowData);
-      return renderedGridRow;
-    });
-
-    return renderedGridRows;
-  };
-
-  if (!props.appInitialized) {
-    return null;
-  }
-
-  if (props.allMediaItems.length === 0) {
-    return null;
-  }
-
-  const gridRows: GridRowData[] = getGridRowData();
-  const renderedGridRows = renderGridRows(gridRows);
 
   return (
-    <div>
-      {renderedGridRows}
-    </div>
+    <List
+      height={window.innerHeight - 100} // Adjust height dynamically
+      itemCount={gridRows.length}
+      itemSize={rowHeight}
+      width={centerColumnWidth}
+    >
+      {RowRenderer}
+    </List>
   );
 };
 
-function mapStateToProps(state: any, ownProps: any) {
+function mapStateToProps(state: any) {
   return {
     appInitialized: getAppInitialized(state),
     allMediaItems: getMediaItems(state),
@@ -97,8 +72,7 @@ function mapStateToProps(state: any, ownProps: any) {
 }
 
 const mapDispatchToProps = (dispatch: TedTaggerDispatch) => {
-  return bindActionCreators({
-  }, dispatch);
+  return bindActionCreators({}, dispatch);
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(GridView);

@@ -3,9 +3,9 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import '../styles/TedTagger.css';
-import { loadMediaItems, loadKeywordData, loadDeletedMediaItems } from '../controllers';
+import { loadMediaItems, loadDeletedMediaItems } from '../controllers';
 import { TedTaggerDispatch, setAppInitialized, setGoogleUserProfile } from '../models';
-import { getKeywordRootNodeId, getPhotoLayout, getSelectedMediaItems } from '../selectors';
+import { getPhotoLayout, getSelectedMediaItems } from '../selectors';
 
 import LoupeViewController from './LoupeViewController';
 import { MediaItem, PhotoLayout } from '../types';
@@ -22,11 +22,9 @@ declare module 'react' {
 export interface AppProps {
   photoLayout: PhotoLayout;
   selectedMediaItems: MediaItem[],
-  onLoadKeywordData: () => any;
   onLoadMediaItems: () => any;
   onLoadDeletedMediaItems: () => any;
   onSetAppInitialized: () => any;
-  keywordRootNodeId: string;
   onSetGoogleUserProfile: (googleUserProfile: any) => void;
 }
 
@@ -206,12 +204,8 @@ const App = (props: AppProps) => {
 
   // Main useEffect to handle authentication and token refreshing
   React.useEffect(() => {
-    props.onLoadKeywordData()
+    props.onLoadMediaItems()
       .then(function () {
-        return props.onLoadMediaItems();
-      }).then(function () {
-        return props.onLoadDeletedMediaItems();
-      }).then(function () {
         return props.onSetAppInitialized();
       });
   }, []);
@@ -279,14 +273,12 @@ const App = (props: AppProps) => {
 function mapStateToProps(state: any) {
   return {
     photoLayout: getPhotoLayout(state),
-    keywordRootNodeId: getKeywordRootNodeId(state),
     selectedMediaItems: getSelectedMediaItems(state),
   };
 }
 
 const mapDispatchToProps = (dispatch: TedTaggerDispatch) => {
   return bindActionCreators({
-    onLoadKeywordData: loadKeywordData,
     onLoadMediaItems: loadMediaItems,
     onLoadDeletedMediaItems: loadDeletedMediaItems,
     onSetAppInitialized: setAppInitialized,

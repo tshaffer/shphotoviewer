@@ -9,7 +9,6 @@ import { MediaItem } from '../types';
 import { getPhotoUrl } from '../utilities';
 import { isNil } from 'lodash';
 import { bodyMargins, toolbarHeight } from '../constants';
-import { Tooltip } from '@mui/material';
 
 export interface LoupeViewProps {
   mediaItem: MediaItem | null;
@@ -49,29 +48,13 @@ const LoupeView = (props: LoupeViewProps) => {
     <div
       id='loupeViewImage'
     >
-      <Tooltip
-        title={props.mediaItem.fileName}
-        placement='top'
-        slotProps={{
-          popper: {
-            modifiers: [
-              {
-                name: 'offset',
-                options: {
-                  offset: [0, -32],
-                },
-              },
-            ],
-          },
-        }}
-      >
-        <div>
-          <img
-            style={{ width: '100%', objectFit: 'contain', maxHeight: maxHeightProperty }}
-            src={src}
-          />
-        </div>
-      </Tooltip>
+
+      <div>
+        <img
+          style={{ width: '100%', objectFit: 'contain', maxHeight: maxHeightProperty }}
+          src={src}
+        />
+      </div>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
+import { VariableSizeList as List, ListChildComponentProps } from 'react-window';
 
 import { GridRowData, MediaItem } from '../types';
 import { TedTaggerDispatch } from '../models';
@@ -22,16 +22,14 @@ const GridView = (props: GridViewProps) => {
     return null;
   }
 
-  const targetHeight = targetHeights[props.numGridColumns - 2];
-
-  // Generate virtualized row data
+  // Generate row data dynamically
   const gridRows: GridRowData[] = React.useMemo(() => {
     const rows: GridRowData[] = [];
     let mediaItemIndex = 0;
     while (mediaItemIndex < props.allMediaItems.length) {
       const rowData = getGridRowHeight(
         centerColumnWidth,
-        targetHeight,
+        targetHeights[props.numGridColumns - 2],
         props.allMediaItems,
         mediaItemIndex,
         props.allMediaItems.length - 1
@@ -42,7 +40,8 @@ const GridView = (props: GridViewProps) => {
     return rows;
   }, [props.allMediaItems, props.numGridColumns]);
 
-  const rowHeight = targetHeight; // Approximate row height
+  // Function to dynamically return row height
+  const getRowHeight = (index: number) => gridRows[index].rowHeight;
 
   // Function to render each row
   const RowRenderer = ({ index, style }: ListChildComponentProps) => {
@@ -54,7 +53,7 @@ const GridView = (props: GridViewProps) => {
     <List
       height={window.innerHeight - 100} // Adjust height dynamically
       itemCount={gridRows.length}
-      itemSize={rowHeight}
+      itemSize={getRowHeight} // Use dynamic row heights
       width={centerColumnWidth}
     >
       {RowRenderer}

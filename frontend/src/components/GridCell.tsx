@@ -17,7 +17,7 @@ import { TedTaggerDispatch, setLoupeViewMediaItemIdRedux, setPhotoLayoutRedux } 
 
 import '../styles/TedTagger.css';
 import { MediaItem, PhotoLayout } from '../types';
-import { getDisplayMetadata, getKeywordLabelsForMediaItem, getMediaItems, isMediaItemSelected } from '../selectors';
+import { getKeywordLabelsForMediaItem, getMediaItems, isMediaItemSelected } from '../selectors';
 import { getPhotoUrl } from '../utilities';
 import { Tooltip, Typography } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
@@ -32,7 +32,6 @@ export interface GridCellPropsFromParent {
 }
 
 export interface GridCellProps extends GridCellPropsFromParent {
-  displayMetadata: boolean;
   isSelected: boolean;
   keywordLabels: string[];
   onClickPhoto: (id: string, commandKey: boolean, shiftKey: boolean) => any;
@@ -103,40 +102,10 @@ const GridCell = (props: GridCellProps) => {
   };
 
 
-  const getMetadataJsx = (): JSX.Element | null => {
-
-    if (!props.displayMetadata) {
-      return null;
-    }
-
-    const creationDate: Dayjs = dayjs(mediaItem.creationTime!);
-    const formattedCreationDate: string = creationDate.format('MM/DD/YYYY hh:mm A');
-    const keywords: string = props.keywordLabels.join(', ');
-
-    return (
-      <div style={{
-        backgroundColor: 'silver',
-        minHeight: '60px',
-      }}
-      >
-        <Typography variant='body2' color='black' fontSize='12px'>
-          {mediaItem.fileName}
-          <br />
-          {formattedCreationDate}
-          <br />
-          {keywords}
-        </Typography>
-      </div >
-    );
-
-  };
-
   const widthAttribute: string = props.cellWidth.toString() + 'px';
-  const metadataHeight: number = props.displayMetadata ? 60 : 0;
   const imgHeightAttribute: string = props.rowHeight.toString() + 'px';
-  const divHeightAttribute: string = (props.rowHeight + metadataHeight).toString() + 'px';
+  const divHeightAttribute: string = (props.rowHeight).toString() + 'px';
 
-  const metadataJsx: JSX.Element | null = getMetadataJsx();
 
   let borderAttr: string = borderSizeStr + ' ';
   borderAttr += props.isSelected ? ' solid blue' : ' solid white';
@@ -168,7 +137,6 @@ const GridCell = (props: GridCellProps) => {
         }}
         onClick={handleClicks}
       >
-        {metadataJsx}
         <img
           src={photoUrl}
           width={widthAttribute}
@@ -184,7 +152,6 @@ const GridCell = (props: GridCellProps) => {
 
 function mapStateToProps(state: any, ownProps: GridCellPropsFromParent) {
   return {
-    displayMetadata: getDisplayMetadata(state),
     isSelected: isMediaItemSelected(state, ownProps.mediaItem),
     mediaItem: ownProps.mediaItem,
     keywordLabels: getKeywordLabelsForMediaItem(state, getMediaItems(state)[ownProps.mediaItemIndex]),

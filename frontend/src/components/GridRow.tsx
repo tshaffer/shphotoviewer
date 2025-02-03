@@ -2,7 +2,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { MediaItem } from '../types';
 import { TedTaggerDispatch } from '../models';
-import { getDisplayMetadata, getMediaItems } from '../selectors';
+import { getMediaItems } from '../selectors';
 import GridCell from './GridCell';
 import { bordersSize } from '../constants';
 
@@ -15,7 +15,6 @@ export interface GridRowPropsFromParent {
 
 export interface GridRowProps extends GridRowPropsFromParent {
   allMediaItems: MediaItem[],
-  displayMetadata: boolean;
 }
 
 const GridRow = (props: GridRowProps) => {
@@ -48,8 +47,7 @@ const GridRow = (props: GridRowProps) => {
 
   const gridCells = getGridCells();
 
-  const metadataHeight: number = props.displayMetadata ? 60 : 0;
-  const heightAttribute: string = (props.rowHeight + metadataHeight + bordersSize).toString() + 'px';
+  const heightAttribute: string = (props.rowHeight + bordersSize).toString() + 'px';
 
   return (
     <div style={{
@@ -65,7 +63,6 @@ const GridRow = (props: GridRowProps) => {
 function mapStateToProps(state: any, ownProps: any) {
   return {
     allMediaItems: getMediaItems(state),
-    displayMetadata: getDisplayMetadata(state),
   };
 }
 

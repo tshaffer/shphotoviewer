@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import '../styles/TedTagger.css';
 import { IconButton, Slider, Typography } from '@mui/material';
-import { TedTaggerDispatch, removeLoupeViewMediaItemId, setDisplayMetadata, setLoupeViewMediaItemIdRedux, setLoupeViewMediaItemIds, setNumGridColumnsRedux, setPhotoLayoutRedux, setScrollPositionRedux, setSurveyModeZoomFactorRedux } from '../models';
+import { TedTaggerDispatch, removeLoupeViewMediaItemId, setLoupeViewMediaItemIdRedux, setLoupeViewMediaItemIds, setNumGridColumnsRedux, setPhotoLayoutRedux, setScrollPositionRedux, setSurveyModeZoomFactorRedux } from '../models';
 import { Tooltip } from '@mui/material';
 
 import GridOnIcon from '@mui/icons-material/GridOn';
@@ -15,7 +15,7 @@ import DeselectIcon from '@mui/icons-material/Deselect';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 
 import { GoogleUserProfile, MediaItem, PhotoLayout, ReviewLevel } from '../types';
-import { getSelectedMediaItemIds, getMediaItems, getNumGridColumns, getPhotoLayout, getDisplayMetadata, getSurveyModeZoomFactor, getDeletedMediaItems, getLoupeViewMediaItemIds, getMediaItemIds, getSelectedMediaItems, getLoupeViewMediaItemId, getGoogleUserProfile } from '../selectors';
+import { getSelectedMediaItemIds, getMediaItems, getNumGridColumns, getPhotoLayout, getSurveyModeZoomFactor, getDeletedMediaItems, getLoupeViewMediaItemIds, getMediaItemIds, getSelectedMediaItems, getLoupeViewMediaItemId, getGoogleUserProfile } from '../selectors';
 import { deleteMediaItems, deselectAllPhotos, redownloadMediaItem, selectPhoto, setReviewLevel } from '../controllers';
 import { sliderContainerXTranslate } from '../constants';
 
@@ -30,13 +30,11 @@ export interface TopToolbarProps {
   numGridColumns: number;
   surveyModeZoomFactor: number;
   photoLayout: PhotoLayout;
-  displayMetadata: boolean;
   deletedMediaItems: MediaItem[];
   onSetNumGridColumns: (numGridColumns: number) => void;
   onSetSurveyModeZoomFactor: (numGridColumns: number) => void;
   onSetPhotoLayout: (photoLayout: PhotoLayout) => void;
   onSetLoupeViewMediaItemId: (id: string) => any;
-  onSetDisplayMetadata: (displayMetadata: boolean) => any;
   onSetScrollPosition: (scrollPosition: number) => any;
   onDeleteMediaItems: (mediaItemIds: string[]) => any;
   onRedownloadMediaItem: (mediaItemId: string) => any;
@@ -107,43 +105,6 @@ const TopToolbar = (props: TopToolbarProps) => {
   function handleDeselectAll(): void {
     props.onDeselectAllPhotos();
   }
-
-  function handlaToggleDisplayMetadata(): void {
-    props.onSetDisplayMetadata(!props.displayMetadata);
-  }
-
-  const deleteLoupeViewMediaItem = () => {
-
-    const loupeViewMediaItemId = props.loupeViewMediaItemId;
-
-    const loupeViewMediaItemIndex = props.loupeViewMediaItemIds.indexOf(loupeViewMediaItemId);
-    if (loupeViewMediaItemIndex < 0) {
-      debugger;
-    }
-
-    // handle the case where there is only one media item in the loupe view.
-    if (props.loupeViewMediaItemIds.length === 1) {
-      debugger;
-    }
-
-    let newLoupeViewMediaItemIndex = -1;
-    const prevLoupeViewMediaItemIndex = loupeViewMediaItemIndex - 1;
-    const nextLoupeViewMediaItemIndex = loupeViewMediaItemIndex + 1;
-    if (nextLoupeViewMediaItemIndex < props.loupeViewMediaItemIds.length) {
-      newLoupeViewMediaItemIndex = nextLoupeViewMediaItemIndex;
-    } else if (prevLoupeViewMediaItemIndex >= 0) {
-      newLoupeViewMediaItemIndex = prevLoupeViewMediaItemIndex;
-    } else {
-      debugger;
-    }
-
-    const newLoupeViewMediaItemId = props.loupeViewMediaItemIds[newLoupeViewMediaItemIndex];
-
-    props.onDeleteMediaItems([props.loupeViewMediaItemId]);
-    props.onRemoveLoupeViewMediaItemId(props.loupeViewMediaItemId);
-    props.onSetLoupeViewMediaItemId(newLoupeViewMediaItemId);
-
-  };
 
   const getPhotoLayoutPropsUI = (): JSX.Element | null => {
     switch (props.photoLayout) {
@@ -267,14 +228,6 @@ const TopToolbar = (props: TopToolbarProps) => {
               </IconButton>
             </span>
           </Tooltip>
-          <Tooltip title="Metadata">
-            <IconButton
-              onClick={() => {
-                handlaToggleDisplayMetadata();
-              }}>
-              <InfoIcon />
-            </IconButton>
-          </Tooltip>
           {getPhotoLayoutPropsUI()}
         </div>
         <div style={{ paddingRight: '10px' }}>
@@ -298,7 +251,6 @@ function mapStateToProps(state: any) {
     numGridColumns: getNumGridColumns(state),
     surveyModeZoomFactor: getSurveyModeZoomFactor(state),
     photoLayout: getPhotoLayout(state),
-    displayMetadata: getDisplayMetadata(state),
     deletedMediaItems: getDeletedMediaItems(state),
     googleUserProfile: getGoogleUserProfile(state),
   };
@@ -309,7 +261,6 @@ const mapDispatchToProps = (dispatch: TedTaggerDispatch) => {
     onSetPhotoLayout: setPhotoLayoutRedux,
     onSetLoupeViewMediaItemId: setLoupeViewMediaItemIdRedux,
     onSetNumGridColumns: setNumGridColumnsRedux,
-    onSetDisplayMetadata: setDisplayMetadata,
     onSetSurveyModeZoomFactor: setSurveyModeZoomFactorRedux,
     onSetScrollPosition: setScrollPositionRedux,
     onDeleteMediaItems: deleteMediaItems,

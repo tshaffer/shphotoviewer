@@ -13,9 +13,7 @@ import { getMediaItemZoomFactor, getSurveyModeZoomFactor } from '../selectors';
 
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { deleteSurveyViewImageContainerItem } from '../controllers';
-import ConfirmationDialog from './ConfirmationDialog';
 import { surveyRowHeights } from '../constants';
 
 const cardMediaStyle = {
@@ -39,27 +37,12 @@ export interface SurveyViewImageContainerProps extends SurveyViewImageContainerP
 
 function SurveyViewImageContainer(props: SurveyViewImageContainerProps) {
 
-  const [openDialog, setOpenDialog] = React.useState(false);
-
   const handleSurveyViewImageZoomIn = () => {
     props.onSetMediaItemZoomFactor(props.mediaItem.uniqueId, props.mediaItemZoomFactor + 0.2);
   };
 
   const handleSurveyViewImageZoomOut = () => {
     props.onSetMediaItemZoomFactor(props.mediaItem.uniqueId, props.mediaItemZoomFactor - 0.2);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
-
-  function handleDeleteSurveyPhoto() {
-    setOpenDialog(true);
-  }
-
-  const handleConfirmDelete = () => {
-    setOpenDialog(false);
-    props.onDeleteSurveyViewImageContainerItem(props.mediaItem.uniqueId);
   };
 
   const photoUrl = getPhotoUrl(props.mediaItem);
@@ -69,15 +52,6 @@ function SurveyViewImageContainer(props: SurveyViewImageContainerProps) {
 
   return (
     <React.Fragment>
-      <div>
-        <ConfirmationDialog
-          open={openDialog}
-          onClose={handleCloseDialog}
-          onConfirm={handleConfirmDelete}
-          title="Confirm Delete"
-          message={'Are you sure you want to delete ' + props.mediaItem.fileName + '?'}
-        />
-      </div>
       <CardMedia
         id={props.mediaItem.uniqueId}
         className='survey-image-container'
@@ -101,12 +75,6 @@ function SurveyViewImageContainer(props: SurveyViewImageContainerProps) {
                 handleSurveyViewImageZoomOut();
               }}>
               <RemoveIcon />
-            </IconButton>
-            <IconButton
-              onClick={() => {
-                handleDeleteSurveyPhoto();
-              }}>
-              <DeleteIcon />
             </IconButton>
           </div>
         </div>

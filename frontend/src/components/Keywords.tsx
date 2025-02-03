@@ -1,9 +1,7 @@
-import * as React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import Box from '@mui/material/Box';
-import { Button } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { TreeView } from '@mui/x-tree-view/TreeView';
@@ -12,8 +10,7 @@ import { Keyword, KeywordNodeDeep, KeywordTreeDeep, MediaItem, StringToKeywordLU
 import { TedTaggerDispatch, } from '../models';
 import { getAppInitialized, getKeywordNodesByNodeId, getKeywordRootNodeId, getKeywordsAsTree, getKeywordsById, getMediaItemById, getSelectedMediaItemIds } from '../selectors';
 
-import AddKeywordDialog from './AddKeywordDialog';
-import { addKeyword, addKeywordToMediaItems, updateKeywordAssignedToSelectedMediaItems } from '../controllers';
+import { addKeyword, updateKeywordAssignedToSelectedMediaItems } from '../controllers';
 import { isNil } from 'lodash';
 import { KeywordTreeItem } from './KeywordTreeItem';
 
@@ -40,19 +37,9 @@ export interface KeywordsProps {
 
 const Keywords = (props: KeywordsProps) => {
 
-  const [showAddKeywordDialog, setShowAddKeywordDialog] = React.useState(false);
-
   if (!props.appInitialized) {
     return null;
   }
-
-  const handleCloseAddKeywordDialog = () => {
-    setShowAddKeywordDialog(false);
-  };
-
-  const handleAddKeyword = (keywordLabel: string, parentKeywordNodeId: string): void => {
-    props.onAddKeyword(parentKeywordNodeId, keywordLabel, 'user');
-  };
 
   function handleUpdateKeywordAssignedToSelectedMediaItems(keywordNodeId: string, assignKeyword: boolean) {
     console.log('handleToggleAssignKeywordToSelectedMediaItems', keywordNodeId, assignKeyword);
@@ -102,7 +89,6 @@ const Keywords = (props: KeywordsProps) => {
     const treeViewItems: JSX.Element = renderTreeViewItems(props.keywordsAsTree!.root);
     return (
       <div>
-        <Button onClick={() => setShowAddKeywordDialog(true)}>Add Keyword</Button>
         <TreeView
           defaultCollapseIcon={<ExpandMoreIcon />}
           defaultExpandIcon={<ChevronRightIcon />}
@@ -117,11 +103,6 @@ const Keywords = (props: KeywordsProps) => {
 
   return (
     <Box sx={{ minHeight: 180, flexGrow: 1, maxWidth: 300 }}>
-      <AddKeywordDialog
-        open={showAddKeywordDialog}
-        onAddKeyword={handleAddKeyword}
-        onClose={handleCloseAddKeywordDialog}
-      />
       {treeViewContents}
     </Box>
   );

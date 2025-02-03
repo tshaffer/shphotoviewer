@@ -6,22 +6,14 @@ import '../styles/TedTagger.css';
 import { loadMediaItems, loadKeywordData, loadTakeouts, importFromTakeout, loadDeletedMediaItems, uploadRawMedia } from '../controllers';
 import { TedTaggerDispatch, setAppInitialized, setGoogleUserProfile } from '../models';
 import { getKeywordRootNodeId, getPhotoLayout, getSelectedMediaItems } from '../selectors';
-import { Button } from '@mui/material';
 
-import Keywords from './Keywords';
-import SearchSpecDialog from './SearchSpecDialog';
-import ViewByReviewLevelsDialog from './ViewByReviewLevelsDialog';
-import ImportFromTakeoutDialog from './ImportFromTakeoutDialog';
-import MergePeopleDialog from './MergePeopleDialog';
 import LoupeViewController from './LoupeViewController';
 import { MediaItem, PhotoLayout } from '../types';
 import SurveyView from './SurveyView';
 import TopToolbar from './TopToolbar';
 import GridView from './GridView';
-import UploadToGoogleDialog from './UploadToGoogleDialog';
 import { uploadToGoogle, getAlbumNamesWherePeopleNotRetrieved } from '../controllers';
 import { uploadPeopleTakeouts } from '../controllers';
-import ImportFromDriveDialog from './ImportFromDriveDialog';
 
 declare module 'react' {
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -46,12 +38,6 @@ const App = (props: AppProps) => {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [showSearchSpecDialog, setShowSearchSpecDialog] = React.useState(false);
-  const [showViewByReviewsLevelDialog, setShowViewByReviewsLevelDialog] = React.useState(false);
-  const [showImportFromTakeoutDialog, setShowImportFromTakeoutDialog] = React.useState(false);
-  const [showMergePeopleDialog, setShowMergePeopleDialog] = React.useState(false);
-  const [showUploadToGoogleDialog, setShowUploadToGoogleDialog] = React.useState(false);
-  const [showImportFromDriveDialog, setShowImportFromDriveDialog] = React.useState(false);
 
   const [importing, setImporting] = useState(false);
   const [uploadingToGoogle, setUploadingToGoogle] = useState(false);
@@ -289,30 +275,6 @@ const App = (props: AppProps) => {
 
   };
 
-  const handleCloseSearchSpecDialog = () => {
-    setShowSearchSpecDialog(false);
-  };
-
-  const handleCloseViewByReviewsLevelDialog = () => {
-    setShowViewByReviewsLevelDialog(false);
-  };
-
-  const handleCloseImportFromTakeoutDialog = () => {
-    setShowImportFromTakeoutDialog(false);
-  };
-
-  const handleCloseMergePeopleDialog = () => {
-    setShowMergePeopleDialog(false);
-  };
-
-  const handleCloseImportFromDriveDialog = () => {
-    setShowImportFromDriveDialog(false);
-  };
-
-  const handleCloseUploadToGoogleDialogDialog = () => {
-    setShowUploadToGoogleDialog(false);
-  };
-
   const handleImportFromDrive = async (files: FileList) => {
 
     console.log('handleImportFromDrive', files);
@@ -380,52 +342,9 @@ const App = (props: AppProps) => {
 
   };
 
-  const renderImport = (): JSX.Element => {
-    return (
-      <ImportFromDriveDialog
-        open={showImportFromDriveDialog}
-        onImportFromDrive={handleImportFromDrive}
-        onClose={handleCloseImportFromDriveDialog}
-      />
-    );
-  }
-
   const renderLeftPanel = (): JSX.Element => {
     return (
       <div className='leftColumnStyle'>
-        <Button onClick={() => setShowViewByReviewsLevelDialog(true)}>View by Review Levels</Button>
-        <ViewByReviewLevelsDialog
-          open={showViewByReviewsLevelDialog}
-          onClose={handleCloseViewByReviewsLevelDialog}
-        />
-        <Keywords />
-        <Button onClick={() => setShowSearchSpecDialog(true)}>Set Search Spec</Button>
-        <SearchSpecDialog
-          open={showSearchSpecDialog}
-          onClose={handleCloseSearchSpecDialog}
-        />
-        <Button onClick={() => setShowImportFromTakeoutDialog(true)}>Import from Takeout</Button>
-        <ImportFromTakeoutDialog
-          open={showImportFromTakeoutDialog}
-          onImportFromTakeout={handleImportFromTakeout}
-          onClose={handleCloseImportFromTakeoutDialog}
-        />
-        <Button onClick={() => setShowImportFromDriveDialog(true)}>Import from Drive</Button>
-        <Button onClick={() => setShowUploadToGoogleDialog(true)} disabled={props.selectedMediaItems.length === 0}
-        >Upload to Google</Button>
-        <UploadToGoogleDialog
-          open={showUploadToGoogleDialog}
-          onUploadToGoogle={handleUploadToGoogle}
-          onClose={handleCloseUploadToGoogleDialogDialog}
-        />
-        <Button onClick={handleRetrievePeople}>Retrieve People</Button>
-        <Button onClick={() => setShowMergePeopleDialog(true)}>Merge People</Button>
-        {renderImport()}
-        <MergePeopleDialog
-          open={showMergePeopleDialog}
-          onMergePeople={handleMergePeople}
-          onClose={handleCloseMergePeopleDialog}
-        />
       </div>
     );
   };

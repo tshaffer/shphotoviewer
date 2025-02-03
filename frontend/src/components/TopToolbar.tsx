@@ -10,21 +10,14 @@ import { Tooltip } from '@mui/material';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import CompareIcon from '@mui/icons-material/Compare';
-import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-import DownloadIcon from '@mui/icons-material/Download';
 import DeselectIcon from '@mui/icons-material/Deselect';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
-import TuneIcon from '@mui/icons-material/Tune';
 
 import { GoogleUserProfile, MediaItem, PhotoLayout, ReviewLevel } from '../types';
 import { getSelectedMediaItemIds, getMediaItems, getNumGridColumns, getPhotoLayout, getDisplayMetadata, getSurveyModeZoomFactor, getDeletedMediaItems, getLoupeViewMediaItemIds, getMediaItemIds, getSelectedMediaItems, getLoupeViewMediaItemId, getGoogleUserProfile } from '../selectors';
-import ConfirmationDialog from './ConfirmationDialog';
 import { deleteMediaItems, deselectAllPhotos, redownloadMediaItem, selectPhoto, setReviewLevel } from '../controllers';
-import DeletedMediaItemsDialog from './DeletedMediaItemsDialog';
 import { sliderContainerXTranslate } from '../constants';
-import SetReviewLevelsDialog from './SetReviewLevelsDialog';
 
 export interface TopToolbarProps {
   mediaItems: MediaItem[];
@@ -55,10 +48,6 @@ export interface TopToolbarProps {
 }
 
 const TopToolbar = (props: TopToolbarProps) => {
-
-  const [showConfirmationDialog, setShowConfirmationDialog] = React.useState(false);
-  const [showDeletedMediaItemsDialog, setShowDeletedMediaItemsDialog] = React.useState(false);
-  const [showSetReviewLevelDialog, setShowSetReviewLevelDialog] = React.useState(false);
 
   function handleSliderChange(event: Event, value: number | number[]): void {
     props.onSetNumGridColumns(value as number);
@@ -123,18 +112,6 @@ const TopToolbar = (props: TopToolbarProps) => {
     props.onSetDisplayMetadata(!props.displayMetadata);
   }
 
-  const handleCloseConfirmationDialog = () => {
-    setShowConfirmationDialog(false);
-  };
-
-  const handleCloseDeletedMediaItemsDialog = () => {
-    setShowDeletedMediaItemsDialog(false);
-  };
-
-  const handleCloseSetReviewLevelDialog = () => {
-    setShowSetReviewLevelDialog(false);
-  };
-
   const deleteLoupeViewMediaItem = () => {
 
     const loupeViewMediaItemId = props.loupeViewMediaItemId;
@@ -167,42 +144,6 @@ const TopToolbar = (props: TopToolbarProps) => {
     props.onSetLoupeViewMediaItemId(newLoupeViewMediaItemId);
 
   };
-
-  const handleConfirmDelete = () => {
-    setShowConfirmationDialog(false);
-    switch (props.photoLayout) {
-      case PhotoLayout.Grid: {
-        props.onDeleteMediaItems(props.selectedMediaItemIds);
-        break;
-      }
-      case PhotoLayout.Loupe: {
-        deleteLoupeViewMediaItem();
-        break;
-      }
-      case PhotoLayout.Survey: {
-        console.log('not implemented yet');
-        break;
-      }
-    }
-  };
-
-  const handleRemoveDeletedMediaItemPhoto = () => {
-    setShowDeletedMediaItemsDialog(true);
-  };
-
-  function handleRedownloadMediaItem() {
-    props.onRedownloadMediaItem(props.selectedMediaItemIds[0]);
-  }
-
-  function handleDeleteSelectedPhotos() {
-    setShowConfirmationDialog(true);
-  }
-
-  const handleSetReviewLevel = (reviewLevel: ReviewLevel) => {
-    console.log('set review level', reviewLevel);
-    props.onSetReviewsLevel(props.selectedMediaItemIds, reviewLevel);
-    setShowSetReviewLevelDialog(false);
-  }
 
   const getPhotoLayoutPropsUI = (): JSX.Element | null => {
     switch (props.photoLayout) {
@@ -269,36 +210,8 @@ const TopToolbar = (props: TopToolbarProps) => {
     }
   }
 
-  let confirmationDialogMessage = 'Are you sure you want to delete ';
-  if (props.selectedMediaItemIds.length === 1) {
-    confirmationDialogMessage += props.selectedMediaItems[0].fileName + '?';
-  } else {
-    confirmationDialogMessage += 'the selected photos?';
-  }
   return (
     <React.Fragment>
-      <div>
-        <ConfirmationDialog
-          open={showConfirmationDialog}
-          onClose={handleCloseConfirmationDialog}
-          onConfirm={handleConfirmDelete}
-          title="Confirm Delete"
-          message={confirmationDialogMessage}
-        />
-      </div>
-      <div>
-        <DeletedMediaItemsDialog
-          open={showDeletedMediaItemsDialog}
-          onClose={handleCloseDeletedMediaItemsDialog}
-        />
-      </div>
-      <div>
-        <SetReviewLevelsDialog
-          open={showSetReviewLevelDialog}
-          onClose={handleCloseSetReviewLevelDialog}
-          onSetReviewLevel={handleSetReviewLevel}
-        />
-      </div>
       <div className='toolbarIconButtonContainer'>
         <div>
           <Tooltip title="Grid">
@@ -365,48 +278,6 @@ const TopToolbar = (props: TopToolbarProps) => {
           {getPhotoLayoutPropsUI()}
         </div>
         <div style={{ paddingRight: '10px' }}>
-          <Tooltip title="Set Review Levels">
-            <span>
-              <IconButton
-                disabled={props.selectedMediaItemIds.length === 0}
-                onClick={() => { setShowSetReviewLevelDialog(true); }}>
-                <TuneIcon />
-              </IconButton>
-            </span>
-          </Tooltip>
-          <Tooltip title="Redownload Image">
-            <span>
-              <IconButton
-                disabled={props.selectedMediaItemIds.length !== 1}
-                onClick={() => {
-                  handleRedownloadMediaItem();
-                }}>
-                <DownloadIcon />
-              </IconButton>
-            </span>
-          </Tooltip>
-          <Tooltip title="Show Deleted Photos">
-            <span>
-              <IconButton
-                disabled={props.deletedMediaItems.length < 1}
-                onClick={() => {
-                  handleRemoveDeletedMediaItemPhoto();
-                }}>
-                <DeleteSweepIcon />
-              </IconButton>
-            </span>
-          </Tooltip>
-          <Tooltip title="Delete Selected Photos">
-            <span>
-              <IconButton
-                disabled={props.selectedMediaItemIds.length < 1}
-                onClick={() => {
-                  handleDeleteSelectedPhotos();
-                }}>
-                <DeleteIcon />
-              </IconButton>
-            </span>
-          </Tooltip>
           {renderUserProfile()}
         </div>
       </div>

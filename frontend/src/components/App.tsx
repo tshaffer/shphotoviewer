@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import '../styles/TedTagger.css';
-import { loadMediaItems, loadKeywordData, loadTakeouts, importFromTakeout, loadDeletedMediaItems } from '../controllers';
+import { loadMediaItems, loadKeywordData, loadDeletedMediaItems } from '../controllers';
 import { TedTaggerDispatch, setAppInitialized, setGoogleUserProfile } from '../models';
 import { getKeywordRootNodeId, getPhotoLayout, getSelectedMediaItems } from '../selectors';
 
@@ -25,10 +25,8 @@ export interface AppProps {
   onLoadKeywordData: () => any;
   onLoadMediaItems: () => any;
   onLoadDeletedMediaItems: () => any;
-  onLoadTakeouts: () => any;
   onSetAppInitialized: () => any;
   keywordRootNodeId: string;
-  onImportFromTakeout: (id: string) => void;
   onSetGoogleUserProfile: (googleUserProfile: any) => void;
 }
 
@@ -36,12 +34,6 @@ const App = (props: AppProps) => {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-
-  const [importing, setImporting] = useState(false);
-  const [uploadingToGoogle, setUploadingToGoogle] = useState(false);
-  const [mergingPeople, setMergingPeople] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const folderInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -216,8 +208,6 @@ const App = (props: AppProps) => {
   React.useEffect(() => {
     props.onLoadKeywordData()
       .then(function () {
-        return props.onLoadTakeouts();
-      }).then(function () {
         return props.onLoadMediaItems();
       }).then(function () {
         return props.onLoadDeletedMediaItems();
@@ -300,8 +290,6 @@ const mapDispatchToProps = (dispatch: TedTaggerDispatch) => {
     onLoadMediaItems: loadMediaItems,
     onLoadDeletedMediaItems: loadDeletedMediaItems,
     onSetAppInitialized: setAppInitialized,
-    onLoadTakeouts: loadTakeouts,
-    onImportFromTakeout: importFromTakeout,
     onSetGoogleUserProfile: setGoogleUserProfile,
   }, dispatch);
 };

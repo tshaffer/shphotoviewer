@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import { CardMedia, IconButton } from '@mui/material';
-
 import { TedTaggerDispatch, setMediaItemZoomFactor } from '../models';
 import { MediaItem } from '../types';
 
@@ -17,7 +16,6 @@ import { surveyRowHeights } from '../constants';
 
 const cardMediaStyle = {
   objectFit: 'contain',
-  height: '1080px',
   backgroundColor: 'purple',
 };
 
@@ -30,11 +28,10 @@ export interface SurveyViewImageContainerPropsFromParent {
 export interface SurveyViewImageContainerProps extends SurveyViewImageContainerPropsFromParent {
   surveyModeZoomFactor: number;
   mediaItemZoomFactor: number;
-  onSetMediaItemZoomFactor: (mediaItemId: string, zoomFactor: number) => any;
+  onSetMediaItemZoomFactor: (mediaItemId: string, zoomFactor: number) => void;
 }
 
 function SurveyViewImageContainer(props: SurveyViewImageContainerProps) {
-
   const handleSurveyViewImageZoomIn = () => {
     props.onSetMediaItemZoomFactor(props.mediaItem.uniqueId, props.mediaItemZoomFactor + 0.2);
   };
@@ -44,9 +41,9 @@ function SurveyViewImageContainer(props: SurveyViewImageContainerProps) {
   };
 
   const photoUrl = getPhotoUrl(props.mediaItem);
+  const zoomFactor = props.surveyModeZoomFactor * props.mediaItemZoomFactor; // Compute zoom factor here
 
   const cardMediaHeight: number = surveyRowHeights[props.numGridRows - 1];
-  cardMediaStyle.height = cardMediaHeight.toString() + 'px';
 
   return (
     <React.Fragment>
@@ -54,24 +51,16 @@ function SurveyViewImageContainer(props: SurveyViewImageContainerProps) {
         id={props.mediaItem.uniqueId}
         className='survey-image-container'
         title={photoUrl}
-        sx={cardMediaStyle}
+        sx={{ ...cardMediaStyle, height: `${cardMediaHeight}px` }}
       >
         <div>
-          <SurveyViewImage
-            mediaItem={props.mediaItem}
-          />
-          <div
-            className='overlayIconStyle'>
-            <IconButton
-              onClick={() => {
-                handleSurveyViewImageZoomIn();
-              }}>
+          {/* ✅ Pass computed zoomFactor */}
+          <SurveyViewImage mediaItem={props.mediaItem} zoomFactor={zoomFactor} />
+          <div className='overlayIconStyle'>
+            <IconButton onClick={handleSurveyViewImageZoomIn}>
               <AddIcon />
             </IconButton>
-            <IconButton
-              onClick={() => {
-                handleSurveyViewImageZoomOut();
-              }}>
+            <IconButton onClick={handleSurveyViewImageZoomOut}>
               <RemoveIcon />
             </IconButton>
           </div>
